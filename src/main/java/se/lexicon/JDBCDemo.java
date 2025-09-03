@@ -12,6 +12,11 @@ public class JDBCDemo {
 
     public static void main(String[] args) {
 
+        ex2();
+
+    }
+
+    private static void ex1() {
         try(Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
 
             Statement statement = connection.createStatement();
@@ -67,6 +72,45 @@ public class JDBCDemo {
         }catch (SQLException e) {
             System.err.println("❌ Error connecting to the database: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private static void ex2() {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+
+             Statement statement = connection.createStatement();
+
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, name, class_group, create_date FROM student WHERE class_group LIKE ?");
+
+
+        ) {
+
+            System.out.println("✅ Connection was made");
+            String classGroupParm = "G1";
+
+
+            preparedStatement.setString(1, classGroupParm);
+
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+
+
+                System.out.println("Student result:");
+
+                while (resultSet.next()) {
+
+                    int id = resultSet.getInt("id");
+                    String name = resultSet.getString("name");
+                    String classGroup = resultSet.getString("class_group");
+                    LocalDateTime createDate = resultSet.getTimestamp("create_date").toLocalDateTime();
+
+
+                    System.out.println("ID: " + id + " | Name: " + name + " | Class: " + classGroup + "| Created At: " + createDate);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error connecting to the database: " + e.getMessage());
+//            e.printStackTrace();
         }
 
     }
